@@ -32,6 +32,9 @@ public class Program
 
         string ipAddressPattern = @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b";
         AnalyzeText(text, "IP-адреси", ipAddressPattern);
+
+        // 4. Завдання: Перевірити, чи всі слова починаються з великої літери, і знайти невідповідності
+        CheckWordsCapitalization(text);
     }
 
     /// <summary>
@@ -73,7 +76,7 @@ public class Program
         }
         catch (RegexMatchTimeoutException)
         {
-            Console.WriteLine("Помилка: Час виконання пошуку за регулярним виразом вичерпану.")
+            Console.WriteLine("Помилка: Час виконання пошуку за регулярним виразом вичерпану.");
         }
         catch (ArgumentException ex)
         {
@@ -82,5 +85,49 @@ public class Program
         }
         
         Console.WriteLine(); // Додаємо порожній рядок для кращої читабельності
+    }
+
+    /// <summary>
+    /// Перевіряє, чи всі слова в тексті починаються з великої літери, і виводить список невідповідностей.
+    /// </summary>
+    /// <param name="inputText">Текст для перевірки.</param>
+    public static void CheckWordsCapitalization(string inputText)
+    {
+        const string description = "Перевірка: чи всі слова починаються з великої літери";
+        // \p{Ll} - будь-яка мала літера в Unicode
+        const string pattern = @"\b\p{Ll}\p{L}*['-]?\p{L}*\b";
+
+        Console.WriteLine($"--- {description} ---");
+
+        if (string.IsNullOrEmpty(inputText))
+        {
+            Console.WriteLine("Помилка: Вхідний текст порожній або null.");
+            Console.WriteLine();
+            return;
+        }
+
+        try
+        {
+            MatchCollection matches = Regex.Matches(inputText, pattern, RegexOptions.Compiled);
+
+            if (matches.Count > 0)
+            {
+                Console.WriteLine($"Знайдено {matches.Count} слів, що починаються з малої літери (невідповідності):");
+                foreach (Match match in matches)
+                {
+                    Console.WriteLine($"- {match.Value}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Успіх! Всі слова в тексті починаються з великої літери.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Під час перевірки сталася помилка: {ex.Message}");
+        }
+
+        Console.WriteLine();
     }
 }
